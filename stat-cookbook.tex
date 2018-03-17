@@ -5,6 +5,7 @@
 %
 % ----------------------------------------------------------------------------
 %
+% Apoorva Lal, forked from Vallentin's code
 % Copyright © Matthias Vallentin <matthias@berkeley.edu>, 2017
 %
 
@@ -14,6 +15,8 @@
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{caption}
+% \usepackage{fourier}
+\usepackage[bitstream-charter]{mathdesign}
 \usepackage[nodayofweek]{datetime}
 \usepackage{environ}
 \usepackage{float}
@@ -74,8 +77,8 @@
 }
 
 % Personal
-\def\email{info@statistics.zone}
-\def\web{\url{http://statistics.zone/}}
+\def\email{lal.apoorva@gmail.com}
+\def\web{---}
 
 % An itemize list with a title that avoids a break between title and list.
 \newenvironment{titemize}[1]{
@@ -89,6 +92,8 @@
 
 \begin{document}
 
+\graphicspath{{/home/alal/tmp/tex-sandbox/stat-cookbook}}
+
 \thispagestyle{empty}
 \begin{center}
   \vspace*{\fill}
@@ -98,7 +103,8 @@
     Version \version\\[1ex]
     \today\\[1ex]
     \web\\[1ex]
-    Copyright \copyright{}
+    \href{http://apoorvalal.github.io}{Apoorva Lal} \\
+    Forked from original repo \url{http://statistics.zone/} by
     \href{http://matthias.vallentin.net}{Matthias Vallentin}\\
   }
 \end{center}
@@ -111,12 +117,12 @@
   \vfill
   \hrule
   \vspace{5pt}
-  {\footnotesize This cookbook integrates various topics in probability theory
-  and statistics, based on literature~\cite{Hoel72,Wasserman03,Shumway06}
-  and in-class material from courses of the statistics department at the
-  University of California in Berkeley but also influenced by others
-  \cite{Steger01,Steger02}. If you find errors or have suggestions for
-  improvements, please get in touch at \web.}
+  {\footnotesize This cookbook integrates various topics in
+  probability theory and statistics, based on
+  literature~\cite{Hoel72,Wasserman03,Shumway06} and in-class material
+  from courses of the statistics and economics departments at the
+  University of California in Berkeley and University of British
+  Columbia but also influenced by others \cite{Steger01,Steger02}.}
 \end{multicols*}
 
 \newpage
@@ -153,7 +159,7 @@
     {n{p_k}}
   \end{array}} \right) & \left( {\begin{array}{*{20}{c}}
     {n{p_1}(1 - {p_1})}&{ - n{p_1}{p_2}}\\
-    { - n{p_2}{p_1}}& \ddots 
+    { - n{p_2}{p_1}}& \ddots
     \end{array}} \right) &
   \left( \sum_{i=0}^k p_i e^{s_i} \right)^n \\[3ex]
 
@@ -199,6 +205,13 @@ to refer to the Beta functions (see \S\ref{sec:math:beta}).}
 \end{figure}
 
 \subsection{Continuous Distributions}
+\begin{itemize}
+\item Standard normal : $z \sim (0,1) ; \mu = 0 , \sigma = 1$
+\item Chi-squared : $\chi^2_n = \sum^n z_i^2, \mu = n, \sigma = 2n$
+\item t : let $x\sim\chi^2_n, Y = z/\sqrt{x/n} \rightarrow y \sim t_n$
+\item F : let $x_1\sim \chi^2_{n1}$, and $x_2\sim \chi^2_{n2}$; $y = \frac{x_1/n_1}{x_2/n_2} \rightarrow Y \sim F{n_1,n_2}$
+
+\end{itemize}
 
 \begin{threeparttable}
 \small
@@ -1720,6 +1733,20 @@ Prediction interval
 \[\Yhat_* \pm \zat \xihat_n\]
 
 \subsection{Multiple Regression}
+Gauss-Markov Assumptions:
+\begin{itemize}
+\item Linearity : $Y = X\beta$
+\item Strict Exogeneity : $E(\epsilon_i | X) = 0$
+  \begin{itemize}
+      \item Unconditional mean of error $E(\epsilon_i) = 0$
+      \item Cross moment of residuals and regressors is zero, X is orthogonal to $\epsilon$ : $E(X_i \epsilon_i) = 0$
+  \end{itemize}
+\item No multicollinearity - $rank(X) = k$
+\item Spherical error variance : $E(\epsilon_i^2|X) = \sigma^2 ; E(\epsilon \epsilon' |X) = \sigma^2 I_n$
+\item $\epsilon|X \sim N(0,\sigma^2 I_n)$
+\item ${(Y_i,X_i): i = 1, ..., n}$ are i.i.d.
+\end{itemize}
+
 
 \[Y = X\beta + \epsilon\]
 where
@@ -1751,6 +1778,171 @@ Unbiased estimate for $\sigma^2$
 
 $1-\alpha$ Confidence interval
 \[\bhat_j \pm \zat\sehat(\bhat_j)\]
+
+\textbf{Generalised least squares}
+
+If covariance matrix of errors is known: $E(\epsilon \epsilon' |X) = \Omega$
+$$
+\hat{\beta}_{GLS} = (X'\Omega^{-1}X)^{-1}X'\Omega^{-1}Y
+$$
+$$
+\mathbb{V}(\hat{\beta}_{GLS}) = (X'\Omega^{-1}X)^{-1}
+$$
+\textbf{Restrited OLS}- optimise: $L(b,\lambda) = (Y-Xb)'(Y-Xb)+2\lambda(Rb-r)$
+
+\textbf{Huber-White Sandwich 'Robust' SEs}
+
+Under homoskedasticity,
+$$
+E[(\hat{\beta} - \beta)(\hat{\beta} - \beta)'] =
+(X'X)^{-1}X'E(\epsilon \epsilon')X(X'X)^{-1}
+$$
+which simplifies to $V(\beta) = \sigma^2(X'X)^{-1}$ because of the assumption $E(\epsilon \epsilon') = \sigma^2 I$.
+
+If this is not true (i.e. heteroskedasticity is presentthe
+variance covariance formula is
+$$
+E[(\hat{\beta} - \beta)(\hat{\beta} - \beta)'] =
+(X'X)^{-1}X'ee'X(X'X)^{-1}
+= \sigma_\epsilon^2 (X'X)^{-1}X' \Omega X(X'X)^{-1}
+$$
+
+$V(\hat{\beta}) =  Q^{-1}\Omega Q^{-1}$ Where,
+$Q=\mathbb{E}X_iXi', \Omega = \mathbb{E}\hat{u_i}^2 X_i X_i'$
+
+
+\textbf{Fitted values and residuals}
+
+Define 2 matrices that are **positive semidifinite, symmetric,idempotent**:
+\begin{itemize}
+\item $P_x = X(X'X)^{-1}X'$ - Hat Matrix - projector into $span(X)$
+\item $M_x = I_n - P_x = I_n - X(X'X)^{-1}X'$ - Annihilator Matrix - projector into $span^{\bot}(X)$
+\end{itemize}
+
+\textbf{Fitted Value}: $\hat{Y} = P_x Y$
+
+\textbf{Residual}: $e = M_x Y$
+
+
+\subsection{Instrumental Variables}
+Exogeneity violated when $E(X_i \epsilon_i) \neq 0$. OLS estimates no longer consistent.
+
+\textbf{IV requirements:}
+\begin{itemize}
+  \item $Cov(Z,X) \neq 0$ - Relevance
+  \item $Cov(Z,\epsilon) = 0 ; Z \bot \epsilon$ - Exogeneity / Exclusion restriction
+  \item Affects Y only through X
+  \item $dim(Z_i) \geq dim(X_i)$
+\end{itemize}
+
+\begin{itemize}
+  \item \textbf{First Stage} : Regress X on Z
+  \item \textbf{Reduced form} : Regress Y on Z
+\end{itemize}
+
+
+$$
+\hat{\beta}_{iv} = (Z'X)^{-1}Z'Y =
+\frac{Cov(Z,Y)}{Cov(Z,X)} = \frac{\hat{\beta}_{reduced form}}{\hat{\beta}_{first stage}}
+$$
+
+$$
+\mathbb{V}(\hat{\beta}_{iv}) = Q_{zx}^{-1} \Omega Q_{xz}^{-1} ; \enspace \Omega = \mathbb{E}z_i z_i' u_i^2
+$$
+If $dim(Z_i) > dim(X_i)$ (more instruments than endogenous regressors),
+$$
+\hat{\beta}_{2SLS} =(X'P_zX)^{-1}X'P_zY =  (X'Z(Z'Z)^{-1}Z'X)^{-1}X'Z(Z'Z)^{-1}Z'Y
+$$
+$$
+\mathbb{V}(\hat{\beta}_{2sls}) =
+(Q_{xz} Q_{zz}^{-1} Q_{zx})^{-1} Q_{xz} Q_{zz}^{-1}
+\Omega Q_{zz}^{-1} Q_{zx} (Q_{xz} Q_{zz}^{-1} Q_{zx})^{-1}  ;
+\enspace \Omega = \mathbb{E}z_i z_i' u_i^2
+$$
+\subsection{Nonlinear Regressions}
+
+Data:
+$\{w_i: i = 1, \cdots , n \} \enspace iid$,
+$w_i \sim f(w,\theta) , \theta \in \Theta \in \mathbb{R}_k$
+
+Because of independence:
+
+\textbf{Likelihood Function}
+
+$$
+L_n(\theta) = \prod_{i=1}^n f(w_i,\theta)
+$$
+
+$$
+log L_n(\theta) = \frac{1}{n} \sum_{i=1}^n log f(w_i,\theta)
+$$
+
+\textbf{MLE Estimator}
+
+$$
+\hat{\theta} = \text{arg max}_{\theta \in \Theta}
+\frac{1}{n} \sum_{i=1}^{n}log f(w_i,\theta)
+$$
+
+\textbf{Information Matrix}
+
+$$
+\Omega = \mathbb{E}
+\frac{\partial log f(w_i,\theta_0)}{\partial \theta}
+\frac{\partial log f(w_i,\theta_0)}{\partial \theta'}
+= -B = I(\theta_0)
+$$
+
+\textbf{Asymptotic Convergence}
+
+$$
+\sqrt{n}(\hat{\theta}-\theta_0)
+\rightarrow_d N(0,B^{-1} \Omega B^{-1})
+= N(0,[ I(\theta_0)]^{-1})
+$$
+
+\textbf{Binary Choice}
+
+$$
+\mathbb{P}(Y_i = 1 | X_i) = 1 - \mathbb{F}(-X_i'\beta)
+$$
+
++ Probit: $F(u) = \Phi(n)$ -  Standard normal $N(0,1)$ CDF
++ Logit:
+    + $F(u) = \Lambda(u)$ = $\frac{1}{1+e^{-u}}$
+    + $f(u) = \Lambda'(u) = (1-e^{-u})^{-2} e^{-u}$
+
+General case: maximize the following Log Likelihood
+
+$$
+log L_n(\beta) = \frac{1}{n} \sum Y_i log \mathbb{F}(X_i'\beta)
+\frac{1}{n} \sum(1-Y_i) log (1-\mathbb{F}(X_i'\beta))
+$$
+
+\textbf{Solutions for Logit} :
+
+$$
+log(\frac{p}{1-p}) = \beta X
+$$
+
+\textbf{Point Estimate}
+
+$$\mathbb{E}(Y_i|X_i) = \mathbb{P}(Y_i=1|X_i) = \Lambda(X_i'\beta)$$
+
+\textbf{Variance}
+
+$$
+I(\beta) = \mathbb{E}[(\Lambda(X_i'\beta)(1-\Lambda(X_i'\beta)) X_i X_i' ]
+$$
+
+\textbf{Marginal Effects}
+
+$$
+\frac{\partial P(Y_i =1 | X_i)}{\partial X_i} = f(X_i'\beta) \beta
+=\Lambda(X_i'\beta)(1-\Lambda(X_i'\beta)) \beta
+$$
+
+
 
 \subsection{Model Selection}
 
@@ -2393,48 +2585,48 @@ P(j/n)
 
 \section{Math}
 
-%\subsection{Orthogonal Functions}
-%
-%$L_2$ space
-%\[L_2(a,b) = \left\{ f: [a,b] \to \R, \int_a^b f(x)^2\dx < \infty \right\}\]
-%
-%Inner Product
-%\[\int f(x)g(x)\dx\]
-%
-%Norm
-%\[\|f\| = \sqrt{\int f^2(x) \dx}\]
-%
-%Orthogonality (for a series of functions $\phi_i$)
-%\begin{align*}
-%  \int \phi_j^2(x)\dx &= 1 \; \forall j \\
-%  \int \phi_i(x)\phi_j(x)\dx &= 0 \; \forall i \neq j
-%\end{align*}
-%
-%An orthogonal sequence $\phi_1, \phi_2,\dots$ is \emph{complete} if the only
-%function that is is orthogonal to each $\phi_j$ is the zero function. Then,
-%$\phi_1, \phi_2,\dots$ form an \emph{orthogonal basis} in $L_2$:
-%\[f \in L_2 \imp f(x) = \sum_{j=1}^\infty \beta_j \phi_j(x)
-%\quad \text{where } \beta_j = \int_a^b f(x)\phi_j(x) \dx\]
-%
-%Cosine Basis
-%\begin{align*}
-%  \phi_0(x) &= 1 \\
-%  \phi_j(x) &= \sqrt{2}\cos(j\pi x) \quad \forall j\ge1
-%\end{align*}
-%
-%\raggedright
-%\textsc{Parseval}'s Relation
-%\[\|f\|^2 \equiv \int f^2(x)\dx = \sum_{j=1}^\infty \equiv \|\beta\|^2\]
-%
-%\textsc{Legendre} Polynomials
-%\begin{align*}
-%  x &\in [-1,1] \\
-%  P_0(x) &= 1\\
-%  P_1(x) &= x \\
-%  P_{j+1}(x) &= \frac{(2j+1)x(P_j(x) - jP_{j-1}(x)}{j+1} \\
-%  \phi_j(x) &= \sqrt{(2j+1)/2} P_j(x) \quad \text{orthogonal basis for }
-%  L_2(-1,1)
-%\end{align*}
+\subsection{Orthogonal Functions}
+
+$L_2$ space
+\[L_2(a,b) = \left\{ f: [a,b] \to \R, \int_a^b f(x)^2\dx < \infty \right\}\]
+
+Inner Product
+\[\int f(x)g(x)\dx\]
+
+Norm
+\[\|f\| = \sqrt{\int f^2(x) \dx}\]
+
+Orthogonality (for a series of functions $\phi_i$)
+\begin{align*}
+ \int \phi_j^2(x)\dx &= 1 \; \forall j \\
+ \int \phi_i(x)\phi_j(x)\dx &= 0 \; \forall i \neq j
+\end{align*}
+
+An orthogonal sequence $\phi_1, \phi_2,\dots$ is \emph{complete} if the only
+function that is is orthogonal to each $\phi_j$ is the zero function. Then,
+$\phi_1, \phi_2,\dots$ form an \emph{orthogonal basis} in $L_2$:
+\[f \in L_2 \imp f(x) = \sum_{j=1}^\infty \beta_j \phi_j(x)
+\quad \text{where } \beta_j = \int_a^b f(x)\phi_j(x) \dx\]
+
+Cosine Basis
+\begin{align*}
+ \phi_0(x) &= 1 \\
+ \phi_j(x) &= \sqrt{2}\cos(j\pi x) \quad \forall j\ge1
+\end{align*}
+
+\raggedright
+\textsc{Parseval}'s Relation
+\[\|f\|^2 \equiv \int f^2(x)\dx = \sum_{j=1}^\infty \equiv \|\beta\|^2\]
+
+\textsc{Legendre} Polynomials
+\begin{align*}
+ x &\in [-1,1] \\
+ P_0(x) &= 1\\
+ P_1(x) &= x \\
+ P_{j+1}(x) &= \frac{(2j+1)x(P_j(x) - jP_{j-1}(x)}{j+1} \\
+ \phi_j(x) &= \sqrt{(2j+1)/2} P_j(x) \quad \text{orthogonal basis for }
+ L_2(-1,1)
+\end{align*}
 
 \subsection{Gamma Function}
 \label{sec:math:gamma}
