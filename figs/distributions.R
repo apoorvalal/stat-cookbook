@@ -10,7 +10,7 @@ library(reshape2)
 library(grid)
 library(RColorBrewer)
 library(VGAM) # [dp]pareto
-
+#%%
 line_width = 1.3
 point_size = 4
 theme_set(theme_bw(base_size=20))
@@ -20,7 +20,7 @@ theme_update(legend.key=element_rect(colour="white"),
 
 # FIXME: is it possible to move this statement into theme_update?
 scale_color_discrete = function(...) scale_color_brewer(..., palette="Dark2")
-
+#%%
 
 # --------------------------------------------------------------------------- #
 
@@ -75,7 +75,7 @@ plot.continuous <- function(from, to, ...) {
   plot.dist(xseq, ...) +
     geom_line(size=line_width)
 }
-
+#%%
 # --------------------------------------------------------------------------- #
 
 plot.uniform.cdf.discrete <- function() {
